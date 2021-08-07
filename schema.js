@@ -2,8 +2,8 @@ const mongoose = require('mongoose');
 
 const postschema = new mongoose.Schema(
     {
-        fname: String,
-        lname: String,
+        title: String,
+        description: String,
         created_on: { type: Date, default: Date.now },
 
     }

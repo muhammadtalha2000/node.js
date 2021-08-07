@@ -1,12 +1,20 @@
-const { request, response } = require('express');
+const { request, response, urlencoded } = require('express');
 const express = require('express');
 const mongoose = require('mongoose');
 const postModel = require('./schema');
+const cors = require('cors')
 
 
+const app = express();
+
+const port = 8000;
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json())
+app.use(cors())
 
 
-const Db_uri = "mongodb+srv://hello:world@cluster0.ltwbc.mongodb.net/dev";
+const Db_uri = "mongodb+srv://talha:godil@cluster0.2tebj.mongodb.net/dev";
 
 mongoose.connect(Db_uri, {
     useNewUrlParser: true,
@@ -15,80 +23,69 @@ mongoose.connect(Db_uri, {
 })
 
 
-const app = express();
-
-const port = 8000;
-
-
-app.get("/add", (request, response) => {
-    postModel.create({ fname: "Talha", lname: "Godil" }, (error, data) => {
-        if (error) {
-            response.send(error.message);
-        } else {
-            console.log(data);
-            response.send("Success");
-        }
-    });
-});
-
-app.get("/data", (request, response) => {
-    postModel.create({ fname: "Mustafa", lname: "Jabbar" }, (error, data) => {
-        if (error) {
-            response.send(error.message);
-        } else {
-            console.log(data);
-            response.send("Success");
-        }
-    });
-});
-
-app.get("/put", (request, response) => {
-    postModel.create({ fname: "Ahmed", lname: "Raza" }, (error, data) => {
-        if (error) {
-            response.send(error.message);
-        } else {
-            console.log(data);
-            response.send("Success");
-        }
-    });
-});
-
-app.get("/search", (request, response) => {
-    postModel.findOne({ fname: "Talha" }, (error, data) => {
-        if (error) {
-            response.send(error.message);
-        } else {
-            console.log(data);
-            response.send(JSON.stringify(data))
-            response.send("Success");
-        }
-    })
-})
-
-app.get("/delete", (request, response) => {
-    postModel.deleteOne({ fname: "Mustafa" }, (error, data) => {
-        if (error) {
-            response.send(error.message);
-        } else {
-            console.log(data);
-            // response.send(JSON.stringify(data))
-            response.send("Success");
-        }
-    })
+app.post('/create', (request, response) => {
+    try {
+        const body = request.body;
+        postModel.create(body, (error, data) => {
+            if (error) {
+                throw error
+            } else {
+                console.log(data)
+                response.send("The post has been created successfully")
+            }
+        })
+    } catch (error) {
+        response.send(`Got an erro`, error.message)
+    }
 })
 
 
-app.get("/update", (request, response) => {
-    postModel.deleteOne({ fname: "Talha", lname: "Godil" }, (error, data) => {
-        if (error) {
-            response.send(error.message);
-        } else {
-            console.log(data);
-            // response.send(JSON.stringify(data))
-            response.send("Success");
+app.get('/posts', (request, response) => {
+    try {
+        const { title } = request.headers;
+        const query = {};
+        if (title) {
+            query.title = title
         }
-    })
-})
+        postModel.find(query, (error, data) => {
+            if (error) {
+                throw error
+            } else {
+                response.send(JSON.stringify(data))
+                console.log(data)
+            }
+        })
+    } catch (error) {
+        response.send(`Got an error during get posts `, error.message);
+    }
+});
+
+app.get("/getapost", (request, response) => {
+    try {
+        const { title } = request.headers;
+        const query = {
+            title: title
+        };
+        if (query.title) {
+            postModel.findOne(query, (error, data) => {
+                if (error) {
+                    throw error;
+                } else {
+                    response.send(JSON.stringify(data));
+                    console.log(data)
+                }
+            });
+        } else {
+            response.send('The required field is missing');
+        }
+    } catch (error) {
+        response.send(`Got an error during get a post `, error.message);
+    }
+});
+
+
+
+
 
 
 
