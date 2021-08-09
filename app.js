@@ -1,8 +1,9 @@
 const { request, response, urlencoded } = require('express');
 const express = require('express');
 const mongoose = require('mongoose');
-const postModel = require('./schema');
+const constructor = require('./schema');
 const cors = require('cors')
+const { postmodel, user_model } = constructor
 
 
 const app = express();
@@ -26,7 +27,7 @@ mongoose.connect(Db_uri, {
 app.post('/create', (request, response) => {
     try {
         const body = request.body;
-        postModel.create(body, (error, data) => {
+        postmodel.create(body, (error, data) => {
             if (error) {
                 throw error
             } else {
@@ -35,7 +36,7 @@ app.post('/create', (request, response) => {
             }
         })
     } catch (error) {
-        response.send(`Got an erro`, error.message)
+        response.send("Got an error", error.message)
     }
 })
 
@@ -47,7 +48,7 @@ app.get('/posts', (request, response) => {
         if (title) {
             query.title = title
         }
-        postModel.find(query, (error, data) => {
+        postmodel.find(query, (error, data) => {
             if (error) {
                 throw error
             } else {
@@ -67,7 +68,7 @@ app.get("/getapost", (request, response) => {
             title: title
         };
         if (query.title) {
-            postModel.findOne(query, (error, data) => {
+            postmodel.findOne(query, (error, data) => {
                 if (error) {
                     throw error;
                 } else {
@@ -79,9 +80,44 @@ app.get("/getapost", (request, response) => {
             response.send('The required field is missing');
         }
     } catch (error) {
-        response.send(`Got an error during get a post `, error.message);
+        response.send("Got an error during get a post", error.message);
     }
 });
+
+app.post('/users', (request, response) => {
+    try {
+        const body = request.body;
+        constructor.user_model.create(body, (error, data) => {
+            if (error) {
+                throw error
+            } else {
+                console.log(data)
+                response.send("The user has been logged in successfully")
+            }
+        })
+    } catch (error) {
+        response.send(`Got an erro`, error.message)
+    }
+})
+
+
+
+app.get('/getusers', (request, response) => {
+    try {
+        const user_email = request.headers;
+        user_model.find({}, (error, data) => {
+            if (error) {
+                throw error
+            } else {
+                console.log("users", data)
+                response.send("The users has signed in")
+            }
+        })
+    } catch (error) {
+        response.send(`Got an error`, error.message)
+    }
+})
+
 
 
 

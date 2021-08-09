@@ -11,4 +11,13 @@ const postschema = new mongoose.Schema(
 
 const postmodel = mongoose.model('post', postschema)
 
-module.exports = postmodel;
+
+const user = new mongoose.Schema({
+
+    email: String,
+    created_on: { type: Date, default: Date.now }
+
+})
+
+const user_model = mongoose.model('users', user)
+module.exports = { postmodel, user_model };
